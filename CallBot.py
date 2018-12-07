@@ -1,7 +1,8 @@
 from pypokerengine.players import BasePokerPlayer
-from pypokerengine.api.game import setup_config, start_poker
+from pypokerengine.utils.card_utils import gen_cards, estimate_hole_card_win_rate
 
-class FishPlayer(BasePokerPlayer):
+# always call
+class CallBot(BasePokerPlayer):
 
 	#  we define the logic to make an action through this method. (so this method would be the core of your AI)
 	def declare_action(self, valid_actions, hole_card, round_state):
@@ -26,11 +27,4 @@ class FishPlayer(BasePokerPlayer):
 		pass
 
 def setup_ai():
-	return FishPlayer()
-
-config = setup_config(max_round=10, initial_stack=200, small_blind_amount=1)
-config.register_player(name="p1", algorithm=FishPlayer())
-config.register_player(name="p2", algorithm=FishPlayer())
-config.register_player(name="p3", algorithm=FishPlayer())
-game_result = start_poker(config, verbose=1)
-print game_result
+	return CallBot()
