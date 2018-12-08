@@ -2,7 +2,7 @@ from pypokerengine.players import BasePokerPlayer
 from pypokerengine.utils.card_utils import gen_cards, estimate_hole_card_win_rate
 
 # only call if win_rate > 1, else fold
-class FoldIfWinning(BasePokerPlayer):
+class CallIfWinning(BasePokerPlayer):
     
     def declare_action(self, valid_actions, hole_card, round_state):
         community_card = round_state['community_card']
@@ -12,7 +12,7 @@ class FoldIfWinning(BasePokerPlayer):
                 hole_card=gen_cards(hole_card),
                 community_card=gen_cards(community_card)
                 )
-        if win_rate >= 1.0 / self.nb_player:
+        if win_rate >= 0.5 or valid_actions[1]["amount"] == 0:
             action = valid_actions[1]  # fetch CALL action info
         else:
             action = valid_actions[0]  # fetch FOLD action info
@@ -34,4 +34,4 @@ class FoldIfWinning(BasePokerPlayer):
         pass
 
 def setup_ai():
-	return FoldIfWinning()
+	return CallIfWinning()
