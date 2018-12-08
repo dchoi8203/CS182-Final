@@ -26,7 +26,7 @@ class MonteCarlo(BasePokerPlayer):
                 amount = valid_actions[2]["amount"]["max"]
             else:
                 action = "raise"
-                amount = min(int(round(pot_after_call*0.667)), valid_actions[2]["amount"]["max"])
+                amount = min(int(round(pot_after_call*0.5)), valid_actions[2]["amount"]["max"])
         elif win_rate >= pot_odds:
             action = "call"
             amount = call_amount
