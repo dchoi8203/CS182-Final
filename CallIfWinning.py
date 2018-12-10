@@ -12,7 +12,7 @@ class CallIfWinning(BasePokerPlayer):
                 hole_card=gen_cards(hole_card),
                 community_card=gen_cards(community_card)
                 )
-        if win_rate >= 0.5 or valid_actions[1]["amount"] == 0:
+        if win_rate >= 0.5 or valid_actions[1]['amount'] == 0:
             action = valid_actions[1]  # fetch CALL action info
         else:
             action = valid_actions[0]  # fetch FOLD action info
