@@ -21,7 +21,7 @@ class MonteCarlo(BasePokerPlayer):
         amount = None
 
         if win_rate >= 0.5:
-            if win_rate >= 0.85:
+            if win_rate >= 0.75:
                 action = "raise"
                 amount = valid_actions[2]["amount"]["max"]
             else:
