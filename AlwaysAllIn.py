@@ -1,10 +1,15 @@
 from pypokerengine.players import BasePokerPlayer
 
-class AlwaysCall(BasePokerPlayer):
+class AlwaysAllIn(BasePokerPlayer):
 
     def declare_action(self, valid_actions, hole_card, round_state):
-        call_action_info = valid_actions[1]
-        action, amount = call_action_info['action'], call_action_info['amount']
+        call_action_info = valid_actions[2]
+        action, amount = call_action_info['action'], call_action_info['amount']['max']
+
+        if amount == -1:
+            action = 'call'
+            amount = valid_actions[1]['amount']
+
         return action, amount
 
     def receive_game_start_message(self, game_info):
@@ -23,4 +28,4 @@ class AlwaysCall(BasePokerPlayer):
         pass
 
 def setup_ai():
-	return AlwaysCall()
+	return AlwaysAllIn()
