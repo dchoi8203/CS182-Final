@@ -25,61 +25,25 @@ class RL(BasePokerPlayer):
         e = random.random()
         call_amount = valid_actions[1]['amount']
 
-        if key not in self.q_vals:
-            if e <= 0.7:
+        val = self.q_vals[key]
+        f, c, r = float(val[0]), float(val[1]), float(val[2])
+        total = sum([f, c, r])
+        f, c, r = f/total, c/total, r/total
+
+        if e <= c:
+            action = 'call'
+            amount = call_amount
+        elif e <= c + r:
+            if call_amount >= self.stack:
                 action = 'call'
                 amount = call_amount
             else:
-                if call_amount >= self.stack:
-                    action = 'call'
-                    amount = call_amount
-                else:
-                    action = 'raise'
-                    pot_after_call = self.pot + call_amount
-                    amount = min(int(round(pot_after_call*0.67)), valid_actions[2]['amount']['max'])
-        # community_card = round_state['community_card']
-        # win_rate = estimate_hole_card_win_rate(
-        #         nb_simulation=100,
-        #         nb_player=2,
-        #         hole_card=gen_cards(hole_card),
-        #         community_card=gen_cards(community_card)
-        #         )
-        # pot_odds = float(call_amount)/float(self.pot)
-        # pot_after_call = self.pot + call_amount
-
-        # if win_rate >= 0.51:
-        #     # if all in to call
-        #     if call_amount >= self.stack:
-        #         action = 'call'
-        #         amount = call_amount
-        #     elif win_rate >= 0.8:
-        #         action = 'raise'
-        #         amount = valid_actions[2]['amount']['max']
-        #     else:
-        #         action = 'raise'
-        #         amount = min(int(round(pot_after_call*0.67)), valid_actions[2]['amount']['max'])
-        # elif win_rate >= pot_odds:
-        #     action = 'call'
-        #     amount = call_amount
-        # else:
-        #     action = 'fold'
-        #     amount = 0
-        else:
-            val = self.q_vals[key]
-            f, c, r = float(val[0]), float(val[1]), float(val[2])
-            total = sum([f, c, r])
-            f, c, r = f/total, c/total, r/total
-
-            if e <= c:
-                action = 'call'
-                amount = call_amount
-            elif e <= c + r:
                 action = 'raise'
                 pot_after_call = self.pot + call_amount
                 amount = min(int(round(pot_after_call*0.67)), valid_actions[2]['amount']['max'])
-            else:
-                action = 'fold'
-                amount = 0
+        else:
+            action = 'fold'
+            amount = 0
 
         self.last_action = action
 
@@ -117,9 +81,6 @@ class RL(BasePokerPlayer):
         self.update_q_vals(won, amount)
         self.save_obj(self.q_vals, 'data')
 
-        # print(self.q_vals)
-        # print(len(self.q_vals))
-
     def gen_hand_ranking(self, hole_card, community_card):
         win_rate = estimate_hole_card_win_rate(
                 nb_simulation=100,
@@ -148,9 +109,9 @@ class RL(BasePokerPlayer):
 
     def update_q_vals(self, won, amount):
         if self.last_action == 'fold':
-            fold_delta = amount/2
-            call_delta = -amount/2
-            raise_delta = -amount/2
+            fold_delta = 2*amount
+            call_delta = -amount
+            raise_delta = -amount
         elif self.last_action == 'call':
             if won:
                 fold_delta = -amount
@@ -184,6 +145,17 @@ class RL(BasePokerPlayer):
                 new_vals = (new_vals[0], new_vals[1], 0)
 
             self.q_vals[key] = new_vals
+
+    def init_q_vals(self):
+        self.q_vals = {}
+        for h in range(4):
+            for s in range(4):
+                for l in range(3):
+                    for p in range(2):
+                        key = (h, s, l, p)
+                        i = random.randint(1, 80000)
+                        j = random.randint(1, 80000)
+                        self.q_vals[key] = (0, i, j)
 
     def save_obj(self, obj, name):
         with open(name + '.pkl', 'wb') as f:
